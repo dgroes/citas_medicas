@@ -1,4 +1,7 @@
-<x-app-layout>
+{{-- C13: Componentes ya creados --}}
+{{-- C14: Reutilización de la plantilla admin para el perfil de usuario de Jetstream --}}
+{{-- Aquí en ves de cargar la plantilla app-layout (x-app-layout), se pasará la de admin --}}
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Profile') }}
@@ -42,4 +45,4 @@
             @endif
         </div>
     </div>
-</x-app-layout>
+</x-admin-layout>
