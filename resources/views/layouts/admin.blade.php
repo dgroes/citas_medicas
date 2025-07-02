@@ -1,4 +1,9 @@
 {{-- C09: Componente con clase --}}
+{{-- C16: @Props --}}
+@props([
+    'title' => config('app.name', 'Laravel'),
+    'breadcrumbs' => [],
+])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -7,17 +12,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ $title }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
 
     {{-- Font Awesome --}}
     <script src="https://kit.fontawesome.com/335ff06f37.js" crossorigin="anonymous"></script>
+
+    <wireui:scripts />
+    {{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Styles -->
     @livewireStyles
@@ -26,19 +37,28 @@
 <body class="font-sans antialiased bg-gray-100">
 
     {{-- C10: Estrucura de las view/routes/controller/layouts/etc --}}
-    @include('layouts.includes.app.navigation')
-    @include('layouts.includes.app.sidebar')
+    @include('layouts.includes.admin.navigation')
+    @include('layouts.includes.admin.sidebar')
 
     <div class="p-4 sm:ml-64">
-        <div class="mt-14">
-            {{ $slot }}
+        <div class="mt-14 flex items-center">
+            @include('layouts.includes.admin.breadcrumb')
+
+            @isset($action)
+                <div class="ml-auto">
+                    {{ $action }}
+                </div>
+            @endisset
         </div>
+        {{ $slot }}
     </div>
 
     @stack('modals')
 
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+
 </body>
 
 </html>

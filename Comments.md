@@ -330,6 +330,112 @@ Por defecto, en el archivo `resources/views/profile/show.blade.php`, se utiliza 
 Sin embargo, se puede integrar el perfil de usuario dentro de tu panel de administración personalizado, reemplazando `<x-app-layout>` por `<x-admin-layout>`.
 
 Esto hará que la plantilla `admin` se cargue, incluyendo elementos como el **sidebar** y la **navbar** que se definió en layouts.admin. El contenido del perfil de usuario se mostrará dentro del `{{ $slot }}` del layout, permitiendo así reutilizar toda la estructura de administración sin perder la funcionalidad del panel de perfil.
+## C15: Composición dinámica de vistas mediante datos estructurados
+Dentro del fichero `resources/views/layouts/includes/app/sidebar.blade.php`, se hace una reutilización de código con un array de configuración, esto se llama: **composición dinámica de vistas mediante datos estructurados**, es una práctica común y recomendada.
+Para seguir el ejmplo del fichero lo que pasa es lo siguiente:
+
+**1. Definición de array `$links`**
+Este array tiene toda la infromación que necesita el sidebar:
+ - Enlaces normales(`name`, `icon`, `href`, `active`)
+- Encabezados de sección (`header`)
+- Submenús(`submenu` con más enlaces dentro)
+Esto permite cambiar el contenido del sidebar sin tocar HTML directamente. Solo se editará el array.
+
+**2. Uso de un `@foreach`**
+Recorrer ese array y se decide qué tipo de ítem se motrará:
+- Si tiene `header` -> muestra un título
+- Si tiene `submenu` -> se genera un dropdown
+- Si no tiene niguno de esos -> es un enlace normal
+```php
+@isset($link['header'])   // título
+@isset($link['submenu'])  // dropdown
+else                      // link simple
+```
+
+**3. Resuable, limpio y desacoplado**
+- Se puede añadir, quitar o cambiar secciones sin duplicar HTML
+- Separa los **datos de la vista**, lo cual es muy mantenible
+- Se puede mover este `$links` a un fichero PHP o incluso a BD si se quiere escalar
+
+Entonces si hace un Renderizado condicional basado en configuración, se hace una Generación dinámica de interfaces y se tiene un Menú dinámico con estructura de datos. en otras palabras, se usa un array como fuente de vedad para generar dinámicacmente el contenido HTML del menú.
+## C16: @Props
+`@props()` sirve para definir **valores que recibirá un componente Blade**. Son como los "atributos" que se puede pasarle al componente, y se comportan como variables internas.
+Relacionado a los ficheros vinculados a `@props` está el componente `admin.blade.php`:
+```php
+@props([
+    'title' => config('app.name', 'Laravel'),
+    'breadcrumbs' => [],
+])
+```
+Aquí lo que pasa es lo siguiente:
+- Se puede pasar un `title`, y si no se hace, será el nombre de la app por defecto(el nombre de la app por defecto está en `.env`: `APP_NAME="Citas Médicas"`)
+- Se puede pasar un array llamado `breadcrumbs`, que si no se hace será un array vacío.
+
+Otro fichero vinculado es `dashboard.blade.php`:
+```php
+<x-admin-layout
+    title="Dashboard | Citas médicas"
+    :breadcrumbs="[
+        [
+            'name' => 'Dashboard',
+            'href' => route('admin.dashboard'),
+        ],
+        [
+            'name' => 'Prueba',
+        ],
+    ]"
+>
+    HOLA DESDE EL ADMIN
+</x-admin-layout>
+```
+**Estos envía esos valores como props al layout:**
+- `"Dashboard | Citas médicas"` llega a la variable `$title`.
+- El array de rutas llega a `$breadcrumbs`
+## C17: Migas de pan (breadcrumb)
+En el fichero `admin.blade.php`, está incluyendo la vista:
+```php
+@include('layouts.includes.admin.breadcrumb')
+```
+Como ya se definió `$breadcrumbs` con `@rops`, **esa variable estará disponible dentro del include.**
+Y en el fichero `breadcrumb.blade.php` está lo siguiente:
+```php
+@if (count($breadcrumbs)) // Solo si hay elementos
+
+    <ol>
+        @foreach ($breadcrumbs as $item)
+            <li>
+                @isset($item['href'])
+                    <a href="{{ $item['href'] }}">{{ $item['name'] }}</a>
+                @else
+                    {{ $item['name'] }}
+                @endisset
+            </li>
+        @endforeach
+    </ol>
+
+    @if (count($breadcrumbs) > 1)
+        <h6>{{ end($breadcrumbs)['name'] }}</h6>
+    @endif
+
+@endif
+```
+Esto musetra el listado de rutas, como:
+```bash
+Dashboard / Prueba
+```
+Y luego el título principal es el último elemento ('prueba')
+## C18:
+## C19:
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
 ##
 ##
 ##
